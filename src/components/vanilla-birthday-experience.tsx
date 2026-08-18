@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { submitRegistration } from "@/app/(flow)/register/actions";
 import { useAppStore } from "@/store/app-store";
 import { initBirthdayExperience } from "@/components/vanilla-birthday-runtime";
@@ -32,14 +33,6 @@ const MARKUP = String.raw`
               <span>Email</span>
               <input id="email" name="email" type="email" autocomplete="email" placeholder="ban@email.com" value="minhanh@example.com" required />
             </label>
-            <label class="field">
-              <span>Điểm gửi (A)</span>
-              <input id="fromPlace" name="fromPlace" type="text" value="Việt Nam" required />
-            </label>
-            <label class="field">
-              <span>Điểm nhận (B)</span>
-              <input id="toPlace" name="toPlace" type="text" value="Paris, Pháp" required />
-            </label>
             <button class="enter-button" type="submit">Bước vào điều bất ngờ <span>→</span></button>
           </form>
           <p class="privacy-note">Thông tin chỉ dùng để cá nhân hoá tấm thiệp trên thiết bị này.</p>
@@ -61,8 +54,8 @@ const MARKUP = String.raw`
                 <span class="latitude latitude--two"></span>
               </div>
               <div class="route" aria-hidden="true"></div>
-              <div class="place place--a"><i><b>A</b></i><span id="fromLabel">Việt Nam</span></div>
-              <div class="place place--b"><i><b>B</b></i><span id="toLabel">Paris, Pháp</span></div>
+              <div class="place place--a"><i><b>A</b></i><span id="fromLabel">Hà Nội, Việt Nam</span></div>
+              <div class="place place--b"><i><b>B</b></i><span id="toLabel">Nhật Bản</span></div>
               <div class="flying-letter" aria-hidden="true"><span>♥</span></div>
             </div>
           </div>
@@ -94,6 +87,7 @@ const MARKUP = String.raw`
             </section>
 
             <section class="letter-panel letter-panel--middle">
+              <div class="letter-divider" aria-hidden="true"><span>✦</span></div>
               <p class="message">
                 Chúc bạn tuổi mới luôn rực rỡ và bình an. Mong những điều bạn
                 đang ấp ủ sẽ từng chút một trở thành hiện thực.
@@ -105,11 +99,11 @@ const MARKUP = String.raw`
             </section>
 
             <section class="letter-panel letter-panel--bottom">
-              <div class="card__decor card__decor--two">✿</div>
-              <button class="wish-button" id="openWishButton" type="button">✦ Viết một điều ước</button>
+              <div class="card__decor card__decor--two" aria-hidden="true"><span>✿</span><i>✦</i></div>
+              <p class="closing-note">Mong tuổi mới sẽ dịu dàng với bạn như một ngày trời trong.</p>
               <div class="letter-closing">
                 <p class="best-wishes">Best wishes,</p>
-                <p class="signature">Từ một người luôn quý bạn ♡</p>
+                <p class="signature">Tuấn</p>
               </div>
             </section>
           </article>
@@ -120,6 +114,10 @@ const MARKUP = String.raw`
             <small>Mở thiệp</small>
           </button>
         </section>
+
+        <div class="wish-launch">
+          <button class="wish-button" id="openWishButton" type="button"><span aria-hidden="true">✦</span> Viết một điều ước</button>
+        </div>
   
         <p class="hint" id="hint">Chạm vào con dấu để mở điều bất ngờ</p>
       </main>
@@ -176,6 +174,7 @@ const MARKUP = String.raw`
 export function VanillaBirthdayExperience() {
   const hostRef = useRef<HTMLDivElement>(null);
   const setUser = useAppStore((state) => state.setUser);
+  const router = useRouter();
 
   useEffect(() => {
     const host = hostRef.current;
@@ -188,6 +187,7 @@ export function VanillaBirthdayExperience() {
     `;
 
     const dispose = initBirthdayExperience(shadow, {
+      onOpenWish: () => router.push("/wishes"),
       onRegister: async (values) => {
         setUser(values);
         return submitRegistration(values);
@@ -198,7 +198,7 @@ export function VanillaBirthdayExperience() {
       dispose();
       shadow.innerHTML = "";
     };
-  }, [setUser]);
+  }, [router, setUser]);
 
   return <div ref={hostRef} className="min-h-dvh" />;
 }

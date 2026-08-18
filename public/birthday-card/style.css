@@ -333,9 +333,17 @@ h1 span { color: var(--berry); font-family: var(--font-great-vibes), "Great Vibe
 
 .message { margin: 9px 0 4px; color: #385c75; font-family: Georgia, serif; font-size: clamp(12px, 2.2vw, 15px); line-height: 1.55; }
 .signature { margin: 5px 0 0; color: var(--berry); font-family: var(--font-great-vibes), "Great Vibes", cursive; font-size: clamp(18px, 3.3vw, 24px); }
-.card__decor { position: absolute; color: var(--peach); font-size: 28px; }
+.card__decor { position: absolute; z-index: 2; color: var(--peach); font-size: 28px; pointer-events: none; }
 .card__decor--one { top: 24px; left: 28px; transform: rotate(-18deg); }
-.card__decor--two { right: 29px; bottom: 24px; color: var(--pink); transform: rotate(15deg); }
+.card__decor--two { left: clamp(18px, 6%, 34px); bottom: clamp(18px, 10%, 36px); display: grid; width: 48px; height: 48px; place-items: center; color: #72c7f2; transform: rotate(-12deg); }
+.card__decor--two span { font-size: 34px; line-height: 1; opacity: .78; }
+.card__decor--two i { position: absolute; right: -5px; top: -5px; color: #ffd37a; font-size: 12px; font-style: normal; }
+
+.letter-divider { display: flex; width: min(72%, 260px); align-items: center; gap: 10px; margin-bottom: 12px; color: rgba(38,124,179,.5); }
+.letter-divider::before, .letter-divider::after { content: ""; height: 1px; flex: 1; background: linear-gradient(90deg, transparent, rgba(38,124,179,.34)); }
+.letter-divider::after { transform: scaleX(-1); }
+.letter-divider span { font-size: 11px; }
+.closing-note { width: min(78%, 330px); margin: 0 auto 14px; color: rgba(56,92,117,.78); font-family: Georgia, serif; font-size: clamp(11px, 2.5vw, 14px); font-style: italic; line-height: 1.55; }
 
 .wish-button {
   position: relative;
@@ -354,8 +362,11 @@ h1 span { color: var(--berry); font-family: var(--font-great-vibes), "Great Vibe
   transition: opacity .4s 1s, transform .4s 1s, background .2s;
   pointer-events: none;
 }
-.envelope.open .wish-button { opacity: 1; transform: none; pointer-events: auto; }
+.envelope.open + .wish-launch .wish-button { opacity: 1; transform: none; pointer-events: auto; }
 .wish-button:hover { background: #c5edff; }
+.wish-launch { position: fixed; z-index: 18; right: 0; bottom: max(18px, env(safe-area-inset-bottom)); left: 0; display: flex; justify-content: center; padding-inline: 16px; pointer-events: none; }
+.wish-launch .wish-button { min-height: 48px; margin: 0; padding: 0 22px; border-color: rgba(38,124,179,.3); background: rgba(238,249,255,.94); box-shadow: 0 12px 32px rgba(18,48,74,.2); backdrop-filter: blur(12px); pointer-events: none; }
+.wish-launch .wish-button span { margin-right: 5px; color: #267cb3; }
 
 .mini-disc {
   position: absolute;
@@ -667,6 +678,25 @@ h1 span { color: var(--berry); font-family: var(--font-great-vibes), "Great Vibe
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
 }
+
+/* Dedicated wishes route */
+.wishes-route { min-height: 100dvh; opacity: 1; visibility: visible; pointer-events: auto; }
+.wishes-route .wish-step h1 { margin: 0; color: white; font-family: Georgia, serif; font-size: clamp(25px, 7vw, 36px); font-weight: 400; line-height: 1.2; letter-spacing: 0; }
+.wish-result-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+.wish-result-actions a { display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.wishes-route .wishes-route__star { width: 44px; filter: none; }
+.wishes-route .wishes-route__star span { position: relative; display: block; width: 3px; height: 3px; margin: auto; border-radius: 50%; background: #f9fdff; box-shadow: 0 0 5px 1px rgba(249,253,255,.98), 0 0 13px 3px rgba(114,199,242,.7); animation: wish-dot-glow 1.8s ease-in-out infinite alternate; }
+.wishes-route .wishes-route__star span::before, .wishes-route .wishes-route__star span::after { content: ""; position: absolute; left: 50%; top: 50%; opacity: 0; pointer-events: none; transform-origin: center top; }
+.wishes-route .wishes-route__star span::before { width: 2px; height: 150px; border-radius: 99px; background: linear-gradient(180deg, rgba(235,248,255,.95), rgba(114,199,242,.22) 66%, transparent); filter: blur(.5px); transform: translate(-50%,0) rotate(var(--trail-angle,0deg)) scaleY(.12); }
+.wishes-route .wishes-route__star span::after { width: 1px; height: 90px; background: linear-gradient(180deg, white, rgba(255,255,255,.36) 55%, transparent); transform: translate(-50%,0) rotate(var(--trail-angle,0deg)) scaleY(.12); }
+.wishes-route .wishes-route__star.is-flying { animation: wish-flight-up 2.2s cubic-bezier(.2,.76,.2,1) forwards; }
+.wishes-route .wishes-route__star.is-flying span::before { animation: shooting-tail 2.2s ease-out forwards; }
+.wishes-route .wishes-route__star.is-flying span::after { animation: shooting-tail-short 2.2s ease-out forwards; }
+@keyframes wish-dot-glow { to { transform: scale(1.16); box-shadow: 0 0 6px 2px white, 0 0 17px 4px rgba(114,199,242,.82); } }
+@keyframes wish-flight-up { 0% { left: 50%; top: 68%; transform: translate(-50%,-50%) scale(.12); opacity: 0; } 12% { opacity: 1; } 65% { transform: translate(-50%,-50%) scale(.46); } 100% { left: var(--star-x); top: var(--star-y); transform: translate(-50%,-50%) scale(1); opacity: 1; } }
+@keyframes shooting-tail { 0%,5% { opacity: 0; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.12); } 14% { opacity: .96; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(1); } 42% { opacity: .82; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.72); } 68% { opacity: .56; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.36); } 82%,100% { opacity: 0; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.04); } }
+@keyframes shooting-tail-short { 0%,8% { opacity: 0; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.12); } 17% { opacity: 1; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(1); } 45% { opacity: .76; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.68); } 70% { opacity: .42; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.3); } 82%,100% { opacity: 0; transform: translate(-50%,0) rotate(var(--trail-angle)) scaleY(.04); } }
+@media (max-width: 520px) { .wish-result-actions { grid-template-columns: 1fr; } }
 
 
 .birthday-root { position: relative; width: 100%; min-height: 100dvh; }
@@ -1203,4 +1233,7 @@ button, input, textarea { touch-action: manipulation; }
 @media (prefers-reduced-motion: reduce) {
   .card, .letter-panel { transition: none !important; }
   .envelope.open .letter-panel { transform: none !important; }
+  .wishes-route .wishes-route__star.is-flying { animation-duration: .01ms !important; }
+  .wishes-route .wishes-route__star.is-flying span::before,
+  .wishes-route .wishes-route__star.is-flying span::after { animation: none !important; }
 }

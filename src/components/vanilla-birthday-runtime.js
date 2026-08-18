@@ -1,5 +1,5 @@
 // Vanilla DOM runtime. React only mounts and disposes this module.
-export function initBirthdayExperience(root, { onRegister }) {
+export function initBirthdayExperience(root, { onOpenWish, onRegister }) {
   const abortController = new AbortController();
   const { signal } = abortController;
   const timers = new Set();
@@ -30,7 +30,6 @@ export function initBirthdayExperience(root, { onRegister }) {
   const openWishButton = root.querySelector('#openWishButton');
   const wishSpace = root.querySelector('#wishSpace');
   const closeWishButton = root.querySelector('#closeWishButton');
-  const stars = root.querySelector('#stars');
   const wishPanel = root.querySelector('#wishPanel');
   const wishWriteStep = root.querySelector('#wishWriteStep');
   const wishCandleStep = root.querySelector('#wishCandleStep');
@@ -62,11 +61,12 @@ export function initBirthdayExperience(root, { onRegister }) {
   let micAnimationId;
   let resumeMusicAfterMic = false;
   let activeWish = '';
-  let wishSent = false;
   let previousFocus;
   let isRaining = false;
   let lastRainDrop = 0;
   const colors = ['#12304a', '#267cb3', '#72c7f2', '#ffd37a', '#f8fcff'];
+  const defaultFromPlace = 'Hà Nội, Việt Nam';
+  const defaultToPlace = 'Nhật Bản';
   
   function resizeCanvas() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -152,31 +152,8 @@ export function initBirthdayExperience(root, { onRegister }) {
     }, unfoldDuration);
   }
   
-  function buildStarField() {
-    if (stars.children.length) return;
-    const fragment = document.createDocumentFragment();
-    for (let index = 0; index < 72; index += 1) {
-      const star = document.createElement('i');
-      star.style.setProperty('--x', `${Math.random() * 100}%`);
-      star.style.setProperty('--y', `${Math.random() * 100}%`);
-      star.style.setProperty('--size', `${1 + Math.random() * 2.2}px`);
-      star.style.setProperty('--alpha', `${.38 + Math.random() * .55}`);
-      star.style.setProperty('--speed', `${1.5 + Math.random() * 3}s`);
-      star.style.setProperty('--delay', `${Math.random() * -4}s`);
-      fragment.appendChild(star);
-    }
-    stars.appendChild(fragment);
-  }
-  
   function openWishSpace() {
-    previousFocus = document.activeElement;
-    buildStarField();
-    isRaining = false;
-    wishSpace.classList.add('is-visible');
-    wishSpace.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    if (wishSent) viewStarButton.focus();
-    else wishInput.focus();
+    onOpenWish();
   }
   
   function closeWishSpace() {
@@ -306,7 +283,6 @@ export function initBirthdayExperience(root, { onRegister }) {
       wishSentStep.hidden = false;
       wishPanel.classList.remove('is-fading');
       wishMemory.textContent = `“${activeWish}”`;
-      wishSent = true;
       viewStarButton.focus();
     }, 3000);
   }
@@ -353,14 +329,22 @@ export function initBirthdayExperience(root, { onRegister }) {
     onRegister(registration).catch(() => {});
     recipientName.textContent = registration.name;
     birthdayLine.textContent = formatBirthday(data.get('birthDate'));
-    fromLabel.textContent = data.get('fromPlace').trim();
-    toLabel.textContent = data.get('toPlace').trim();
+    fromLabel.textContent = defaultFromPlace;
+    toLabel.textContent = defaultToPlace;
+    try {
+      sessionStorage.setItem('birthdayGuest', JSON.stringify({
+        fullName: registration.name,
+        birthDate: registration.dob,
+        fromPlace: defaultFromPlace,
+        toPlace: defaultToPlace
+      }));
+    } catch {}
     welcome.classList.add('is-leaving');
     delivery.classList.add('is-visible');
     delivery.setAttribute('aria-hidden', 'false');
     startMusic();
     statusTimer = later(() => {
-      deliveryStatus.textContent = `Đang đến gần ${data.get('toPlace').trim()}...`;
+      deliveryStatus.textContent = `Đang đến gần ${defaultToPlace}...`;
     }, 3900);
     deliveryTimer = later(finishDelivery, 6200);
   }, { signal });
@@ -455,6 +439,21 @@ export function initBirthdayExperience(root, { onRegister }) {
   window.addEventListener('resize', resizeCanvas, { signal });
   resizeCanvas();
   animationId = requestAnimationFrame(drawConfetti);
+
+  if (new URLSearchParams(window.location.search).get('view') === 'card') {
+    try {
+      const guest = JSON.parse(sessionStorage.getItem('birthdayGuest') || '{}');
+      if (guest.fullName) recipientName.textContent = guest.fullName;
+      if (guest.birthDate) birthdayLine.textContent = formatBirthday(guest.birthDate);
+      if (guest.fromPlace) fromLabel.textContent = guest.fromPlace;
+      if (guest.toPlace) toLabel.textContent = guest.toPlace;
+    } catch {}
+    welcome.classList.add('is-leaving');
+    delivery.setAttribute('aria-hidden', 'true');
+    cardScene.classList.add('is-visible');
+    cardScene.setAttribute('aria-hidden', 'false');
+    later(openCard, 120);
+  }
   
   return () => {
     abortController.abort();
