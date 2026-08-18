@@ -35,7 +35,7 @@ const MARKUP = String.raw`
             </label>
             <button class="enter-button" type="submit">Bước vào điều bất ngờ <span>→</span></button>
           </form>
-          <p class="privacy-note">Thông tin chỉ dùng để cá nhân hoá tấm thiệp trên thiết bị này.</p>
+          <p class="privacy-note" id="privacyNote" aria-live="polite">Khi tiếp tục, bạn có thể cho phép vị trí để cá nhân hoá hành trình. Nếu từ chối, thiệp vẫn hoạt động bình thường.</p>
         </div>
       </section>
   
@@ -171,7 +171,18 @@ const MARKUP = String.raw`
   </div>
 `;
 
-export function VanillaBirthdayExperience() {
+type InitialGuest = {
+  fullName: string;
+  birthDate: string;
+  fromPlace?: string;
+  toPlace?: string;
+};
+
+export function VanillaBirthdayExperience({
+  initialGuest,
+}: {
+  initialGuest?: InitialGuest;
+} = {}) {
   const hostRef = useRef<HTMLDivElement>(null);
   const setUser = useAppStore((state) => state.setUser);
   const router = useRouter();
@@ -192,13 +203,14 @@ export function VanillaBirthdayExperience() {
         setUser(values);
         return submitRegistration(values);
       },
+      initialGuest,
     });
 
     return () => {
       dispose();
       shadow.innerHTML = "";
     };
-  }, [router, setUser]);
+  }, [initialGuest, router, setUser]);
 
   return <div ref={hostRef} className="min-h-dvh" />;
 }

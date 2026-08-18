@@ -8,5 +8,11 @@ export function initBirthdayExperience(
     onRegister: (
       values: RegisterFormValues,
     ) => Promise<SubmitRegistrationResult>;
+    initialGuest?: {
+      fullName: string;
+      birthDate: string;
+      fromPlace?: string;
+      toPlace?: string;
+    };
   },
 ): () => void;

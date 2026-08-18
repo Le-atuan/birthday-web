@@ -1,7 +1,6 @@
 import { DateTime } from "luxon";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const VN_PHONE_REGEX = /^(0|\+84)\d{9,10}$/;
 const MIN_AGE_YEARS = 1;
 const MAX_AGE_YEARS = 120;
 
@@ -10,6 +9,11 @@ export type RegisterFormValues = {
   dob: string;
   email: string;
   phone: string;
+  destinationLatitude: number | null;
+  destinationLongitude: number | null;
+  locationAccuracy: number | null;
+  locationCapturedAt: string | null;
+  timezone?: string;
 };
 
 export type RegisterFormErrors = Partial<
@@ -17,7 +21,7 @@ export type RegisterFormErrors = Partial<
 >;
 
 export function validateRegisterForm(
-  values: RegisterFormValues
+  values: RegisterFormValues,
 ): RegisterFormErrors {
   const errors: RegisterFormErrors = {};
 

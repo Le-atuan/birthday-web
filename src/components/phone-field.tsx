@@ -29,7 +29,7 @@ export function PhoneField({
         value={value}
         required={required}
         onChange={(event) => onChange(event.target.value)}
-        className={`h-[52px] w-full rounded-2xl border bg-bg-elevated px-4 text-base text-fg outline-none placeholder:text-fg-muted/60 focus:border-accent ${
+        className={`h-13 w-full rounded-2xl border bg-bg-elevated px-4 text-base text-fg outline-none placeholder:text-fg-muted/60 focus:border-accent ${
           error ? "border-danger" : "border-border"
         }`}
       />

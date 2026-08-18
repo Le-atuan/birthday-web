@@ -11,7 +11,7 @@ export function PrimaryButton({
   return (
     <Link
       href={href}
-      className="flex h-[54px] w-full items-center justify-center rounded-full bg-accent text-base font-semibold text-accent-ink transition-opacity active:opacity-80"
+      className="flex h-13.5 w-full items-center justify-center rounded-full bg-accent text-base font-semibold text-accent-ink transition-opacity active:opacity-80"
     >
       {children}
     </Link>

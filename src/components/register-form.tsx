@@ -16,8 +16,12 @@ const EMPTY_VALUES: RegisterFormValues = {
   dob: "",
   email: "",
   phone: "",
+  destinationLatitude: null,
+  destinationLongitude: null,
+  locationAccuracy: null,
+  locationCapturedAt: null,
 };
-type FieldName = keyof RegisterFormValues;
+type FieldName = keyof RegisterFormErrors;
 
 export function RegisterForm() {
   const router = useRouter();
