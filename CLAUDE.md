@@ -1,9 +1,27 @@
 @AGENTS.md
 
+## Design Systems (3 hệ thống song song — đọc trước khi dùng skill UI)
+
+Project này có **3 hệ thống CSS/design độc lập, không tương thích lẫn nhau**. Trước khi sửa UI hoặc dùng bất kỳ skill thiết kế nào (`frontend-design`, `ui-styling`, `ui-ux-pro-max`, `design`...), xác định file đang sửa thuộc hàng nào rồi chỉ dùng đúng pattern/token của hàng đó:
+
+| Khu vực / route | Hệ thống | File style | Token/class đại diện |
+|---|---|---|---|
+| `/`, `/invite/[token]` (`vanilla-birthday-experience.tsx` + `vanilla-birthday-runtime.js`) | **Vanilla CSS trong Shadow DOM** | `public/birthday-card/style.css` | `--ink`, `--berry`, `--pink`, `--peach`, `--cream`, `--paper`, `--shadow`; class kiểu `.enter-button`, `.guest-form`, `.delivery__content`, `.field--wide` |
+| `/wishes` (`vanilla-wishes-experience.tsx` + `vanilla-wishes-runtime.js`) | **Vanilla CSS trong Shadow DOM** (Shadow root riêng) | file CSS tương ứng nạp trong Shadow root của runtime đó | tương tự trên; class Tailwind như `bg-[#071321]` chỉ áp cho `<div>` host bên ngoài, không lọt vào bên trong |
+| `/register`, `/journey`, `/permission` và các `flow/steps/*`, `primary-button.tsx`, `field-shell.tsx`, `footer-note.tsx` | **Tailwind v4 + theme tokens** | `src/app/globals.css` (`@theme` map `--theme-*` → `--color-*`) | `bg-accent`, `text-fg-muted`, `text-danger`... (không dùng bảng màu Tailwind mặc định như `bg-blue-500`) |
+| `register-form.tsx` (bản React cũ, không phải bản đang chạy ở `/`), `birthday-waiting-page.tsx`, `src/components/admin/*` | **CSS Modules** | `birthday-card.module.css`, `birthday-waiting-page.module.css`, `admin/admin.module.css` | `styles.xxx` |
+
+**Luật bắt buộc:**
+1. Không bao giờ thêm class Tailwind vào bên trong `MARKUP`/Shadow DOM của `vanilla-*-experience.tsx` — **Tailwind không xuyên được Shadow DOM**, mọi class Tailwind gắn ở đó vô tác dụng. Sửa style cho 2 luồng vanilla chỉ bằng cách sửa trực tiếp file CSS tương ứng (vd `public/birthday-card/style.css`), dùng đúng token/naming đã có — không tự bịa token màu mới.
+2. Ở luồng Tailwind (`globals.css`), chỉ dùng token đã khai báo trong `@theme`, không dùng bảng màu Tailwind mặc định — tránh lệch tông với `--theme-primary` và các biến theme khác.
+3. Không tự ý cài/khởi tạo shadcn/ui (không có `components.json`, project chưa dùng shadcn) dù skill UI có thể gợi ý mặc định shadcn+Tailwind.
+4. Khi một skill thiết kế UI đề xuất màu sắc/spacing/component mẫu cho khu vực thuộc luồng vanilla (`/`, `/wishes`): áp dụng đề xuất đó **thủ công vào đúng file CSS của luồng đó** theo token sẵn có, không copy nguyên class/markup Tailwind hay component shadcn mẫu vào trong Shadow DOM.
+5. Sau khi sửa CSS/markup ở luồng vanilla, luôn chạy `next dev` và xem trực tiếp trong trình duyệt trước khi báo hoàn thành — Shadow DOM không thể kiểm chứng chỉ bằng đọc code.
+
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence
 
-This project is indexed by GitNexus as **birthday-web** (327 symbols, 667 relationships, 24 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
+This project is indexed by GitNexus as **birthday-web** (420 symbols, 859 relationships, 32 execution flows). Use the GitNexus MCP tools to understand code, assess impact, and navigate safely.
 
 > Index stale? Run `node .gitnexus/run.cjs analyze` from the project root — it auto-selects an available runner. No `.gitnexus/run.cjs` yet? `npx gitnexus analyze` (npm 11 crash → `npm i -g gitnexus`; #1939).
 

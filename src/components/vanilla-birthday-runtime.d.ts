@@ -14,5 +14,6 @@ export function initBirthdayExperience(
       fromPlace?: string;
       toPlace?: string;
     };
+    isBypassGuestFormEnabled?: boolean;
   },
 ): () => void;

@@ -1,7 +1,7 @@
 // Vanilla DOM runtime. React only mounts and disposes this module.
 export function initBirthdayExperience(
   root,
-  { onOpenWish, onRegister, initialGuest },
+  { onOpenWish, onRegister, initialGuest, isBypassGuestFormEnabled },
 ) {
   const abortController = new AbortController();
   const { signal } = abortController;
@@ -28,8 +28,15 @@ export function initBirthdayExperience(
   const delivery = root.querySelector("#delivery");
   const skipDelivery = root.querySelector("#skipDelivery");
   const deliveryStatus = root.querySelector("#deliveryStatus");
+  const deliveryProgress = root.querySelector(".delivery__progress span");
   const fromLabel = root.querySelector("#fromLabel");
   const toLabel = root.querySelector("#toLabel");
+  const globe = root.querySelector(".globe");
+  const route = root.querySelector(".route");
+  const flightPath = root.querySelector("#flightPath");
+  const originMarker = root.querySelector(".place--a");
+  const destinationMarker = root.querySelector(".place--b");
+  const flyingLetter = root.querySelector(".flying-letter");
   const recipientName = root.querySelector("#recipientName");
   const birthdayLine = root.querySelector("#birthdayLine");
   const openWishButton = root.querySelector("#openWishButton");
@@ -56,11 +63,11 @@ export function initBirthdayExperience(
 
   let pieces = [];
   let animationId;
+  let flightAnimationId;
+  let flightProgress = 0;
   let audioContext;
   let isPlaying = false;
   let tuneTimer;
-  let deliveryTimer;
-  let statusTimer;
   let micStream;
   let micContext;
   let micAnimationId;
@@ -69,9 +76,98 @@ export function initBirthdayExperience(
   let previousFocus;
   let isRaining = false;
   let lastRainDrop = 0;
+  let isSubmittingGuestForm = false;
   const colors = ["#12304a", "#267cb3", "#72c7f2", "#ffd37a", "#f8fcff"];
   const defaultFromPlace = "Hà Nội, Việt Nam";
   const defaultToPlace = "Nhật Bản";
+  const globeSize = 258;
+  const originPoint = { x: 48, y: 190 };
+  let destinationPoint = { x: 209, y: 62 };
+
+  function setMarkerPosition(marker, point) {
+    marker.style.left = `${(point.x / globeSize) * 100}%`;
+    marker.style.top = `${(point.y / globeSize) * 100}%`;
+  }
+
+  function updateFlightPath() {
+    const dx = destinationPoint.x - originPoint.x;
+    const dy = destinationPoint.y - originPoint.y;
+    const distance = Math.hypot(dx, dy);
+    const arcHeight = Math.min(68, Math.max(35, distance * 0.34));
+    const controlX = (originPoint.x + destinationPoint.x) / 2;
+    const controlY = Math.max(
+      18,
+      Math.min(originPoint.y, destinationPoint.y) - arcHeight,
+    );
+
+    setMarkerPosition(originMarker, originPoint);
+    setMarkerPosition(destinationMarker, destinationPoint);
+    flightPath.setAttribute(
+      "d",
+      `M ${originPoint.x} ${originPoint.y} Q ${controlX} ${controlY} ${destinationPoint.x} ${destinationPoint.y}`,
+    );
+  }
+
+  function positionLetter(progress) {
+    const pathLength = flightPath.getTotalLength();
+    const current = flightPath.getPointAtLength(pathLength * progress);
+    const next = flightPath.getPointAtLength(
+      Math.min(pathLength, pathLength * progress + 1.5),
+    );
+    const scaleX = globe.clientWidth / globeSize;
+    const scaleY = globe.clientHeight / globeSize;
+    const angle =
+      Math.atan2((next.y - current.y) * scaleY, (next.x - current.x) * scaleX) *
+      (180 / Math.PI);
+    const letterScale =
+      0.82 + Math.sin(progress * Math.PI) * 0.2 - progress * 0.12;
+
+    flyingLetter.style.left = `${current.x * scaleX}px`;
+    flyingLetter.style.top = `${current.y * scaleY}px`;
+    flyingLetter.style.opacity = String(
+      progress < 0.96 ? 1 : Math.max(0.28, 1 - (progress - 0.96) * 12),
+    );
+    flyingLetter.style.transform = `translate(-50%, -50%) rotate(${angle}deg) scale(${letterScale})`;
+  }
+
+  function updateDeliveryStatus(progress) {
+    if (progress < 0.1) {
+      deliveryStatus.textContent = "Đang rời điểm A...";
+    } else if (progress < 0.9) {
+      deliveryStatus.textContent = "Đang di chuyển...";
+    } else {
+      deliveryStatus.textContent = "Sắp tới đích...";
+    }
+  }
+
+  function startFlightAnimation() {
+    cancelAnimationFrame(flightAnimationId);
+    updateFlightPath();
+    route.classList.add("is-flying");
+    deliveryProgress.style.transform = "scaleX(0)";
+    updateDeliveryStatus(0);
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const duration = reduceMotion ? 1 : 6000;
+    const startedAt = performance.now();
+
+    const animateFlight = (now) => {
+      const rawProgress = Math.min(1, (now - startedAt) / duration);
+      const progress = 1 - Math.pow(1 - rawProgress, 3);
+      flightProgress = progress;
+      positionLetter(progress);
+      deliveryProgress.style.transform = `scaleX(${progress})`;
+      updateDeliveryStatus(progress);
+      if (rawProgress < 1) {
+        flightAnimationId = requestAnimationFrame(animateFlight);
+      } else {
+        route.classList.remove("is-flying");
+        finishDelivery();
+      }
+    };
+    flightAnimationId = requestAnimationFrame(animateFlight);
+  }
 
   function resizeCanvas() {
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
@@ -152,7 +248,7 @@ export function initBirthdayExperience(
     const reduceMotion = window.matchMedia(
       "(prefers-reduced-motion: reduce)",
     ).matches;
-    const unfoldDuration = reduceMotion ? 40 : 1650;
+    const unfoldDuration = reduceMotion ? 40 : 2500;
     card.setAttribute("aria-busy", "true");
     envelope.classList.add("open");
     openButton.setAttribute("aria-expanded", "true");
@@ -371,17 +467,26 @@ export function initBirthdayExperience(
 
   function updateDestination(location) {
     if (!location) {
+      destinationPoint = { x: 209, y: 62 };
+      updateFlightPath();
       toLabel.textContent = defaultToPlace;
       privacyNote.textContent =
         "Không sử dụng vị trí. Hành trình sẽ tiếp tục tới Nhật Bản.";
       return;
     }
-    const left = 10 + ((location.longitude + 180) / 360) * 80;
-    const top = 10 + ((90 - location.latitude) / 180) * 72;
-    const destinationMarker = root.querySelector(".place--b");
-    destinationMarker.style.right = "auto";
-    destinationMarker.style.left = `${Math.max(8, Math.min(88, left))}%`;
-    destinationMarker.style.top = `${Math.max(8, Math.min(78, top))}%`;
+    const left = Math.max(
+      10,
+      Math.min(90, 10 + ((location.longitude + 180) / 360) * 80),
+    );
+    const top = Math.max(
+      10,
+      Math.min(78, 10 + ((90 - location.latitude) / 180) * 72),
+    );
+    destinationPoint = {
+      x: (left / 100) * globeSize,
+      y: (top / 100) * globeSize,
+    };
+    updateFlightPath();
     toLabel.textContent = "Vị trí hiện tại";
     privacyNote.textContent = "Đã dùng vị trí để cá nhân hoá hành trình.";
   }
@@ -390,55 +495,70 @@ export function initBirthdayExperience(
     "submit",
     async (event) => {
       event.preventDefault();
+      if (isSubmittingGuestForm) return;
+      isSubmittingGuestForm = true;
+      const originalButtonMarkup = submitButton.innerHTML;
       submitButton.disabled = true;
+      submitButton.classList.add("is-loading");
       submitButton.textContent = "Đang chuẩn bị hành trình...";
-      const data = new FormData(guestForm);
-      const location = await requestDestinationLocation();
-      updateDestination(location);
-      const registration = {
-        name: String(data.get("fullName") || "").trim(),
-        dob: String(data.get("birthDate") || ""),
-        email: String(data.get("email") || "").trim(),
-        phone: String(data.get("phone") || "").trim(),
-        destinationLatitude: location?.latitude ?? null,
-        destinationLongitude: location?.longitude ?? null,
-        locationAccuracy: location?.accuracy ?? null,
-        locationCapturedAt: location?.capturedAt ?? null,
-        timezone:
-          Intl.DateTimeFormat().resolvedOptions().timeZone ||
-          "Asia/Ho_Chi_Minh",
-      };
-      onRegister(registration).catch(() => {});
-      recipientName.textContent = registration.name;
-      birthdayLine.textContent = formatBirthday(data.get("birthDate"));
-      fromLabel.textContent = defaultFromPlace;
-      if (!location) toLabel.textContent = defaultToPlace;
       try {
-        sessionStorage.setItem(
-          "birthdayGuest",
-          JSON.stringify({
-            fullName: registration.name,
-            birthDate: registration.dob,
-            fromPlace: defaultFromPlace,
-            toPlace: defaultToPlace,
-          }),
-        );
-      } catch {}
-      welcome.classList.add("is-leaving");
-      delivery.classList.add("is-visible");
-      delivery.setAttribute("aria-hidden", "false");
-      startMusic();
-      statusTimer = later(() => {
-        deliveryStatus.textContent = `Đang đến gần ${defaultToPlace}...`;
-      }, 3900);
-      deliveryTimer = later(finishDelivery, 6200);
+        const data = new FormData(guestForm);
+        const location = await requestDestinationLocation();
+        updateDestination(location);
+        const registration = {
+          name: String(data.get("fullName") || "").trim(),
+          dob: String(data.get("birthDate") || ""),
+          email: String(data.get("email") || "").trim(),
+          phone: String(data.get("phone") || "").trim(),
+          destinationLatitude: location?.latitude ?? null,
+          destinationLongitude: location?.longitude ?? null,
+          locationAccuracy: location?.accuracy ?? null,
+          locationCapturedAt: location?.capturedAt ?? null,
+          timezone:
+            Intl.DateTimeFormat().resolvedOptions().timeZone ||
+            "Asia/Ho_Chi_Minh",
+        };
+        const result = await onRegister(registration);
+        if (!result?.success) throw new Error("registration-failed");
+
+        recipientName.textContent = registration.name;
+        birthdayLine.textContent = formatBirthday(data.get("birthDate"));
+        fromLabel.textContent = defaultFromPlace;
+        if (!location) toLabel.textContent = defaultToPlace;
+        try {
+          sessionStorage.setItem(
+            "birthdayGuest",
+            JSON.stringify({
+              fullName: registration.name,
+              birthDate: registration.dob,
+              fromPlace: defaultFromPlace,
+              toPlace: defaultToPlace,
+            }),
+          );
+        } catch {}
+        welcome.classList.add("is-leaving");
+        delivery.classList.add("is-visible");
+        delivery.setAttribute("aria-hidden", "false");
+        startFlightAnimation();
+        startMusic();
+      } catch {
+        privacyNote.textContent = "Không thể lưu thông tin, vui lòng thử lại.";
+        submitButton.disabled = false;
+        submitButton.classList.remove("is-loading");
+        submitButton.innerHTML = originalButtonMarkup;
+      } finally {
+        isSubmittingGuestForm = false;
+      }
     },
     { signal },
   );
 
   function finishDelivery() {
-    clearTimeout(deliveryTimer);
-    clearTimeout(statusTimer);
+    cancelAnimationFrame(flightAnimationId);
+    route.classList.remove("is-flying");
+    flightProgress = 1;
+    positionLetter(flightProgress);
+    deliveryProgress.style.transform = "scaleX(1)";
     delivery.classList.add("is-leaving");
     delivery.setAttribute("aria-hidden", "true");
     cardScene.classList.add("is-visible");
@@ -559,21 +679,34 @@ export function initBirthdayExperience(
   document.addEventListener("keydown", trapWishFocus, { signal });
   window.addEventListener("pagehide", () => stopMicrophone(false), { signal });
   window.addEventListener("resize", resizeCanvas, { signal });
+  window.addEventListener("resize", () => positionLetter(flightProgress), {
+    signal,
+  });
   resizeCanvas();
+  updateFlightPath();
+  positionLetter(0);
   animationId = requestAnimationFrame(drawConfetti);
 
-  if (initialGuest) {
-    recipientName.textContent = initialGuest.fullName;
-    birthdayLine.textContent = formatBirthday(initialGuest.birthDate);
-    fromLabel.textContent = initialGuest.fromPlace || defaultFromPlace;
-    toLabel.textContent = initialGuest.toPlace || defaultToPlace;
+  const guestForCard =
+    initialGuest ||
+    (isBypassGuestFormEnabled
+      ? {
+          fullName: guestForm.querySelector("#fullName").value,
+          birthDate: guestForm.querySelector("#birthDate").value,
+          fromPlace: defaultFromPlace,
+          toPlace: defaultToPlace,
+        }
+      : null);
+
+  if (guestForCard) {
+    recipientName.textContent = guestForCard.fullName;
+    birthdayLine.textContent = formatBirthday(guestForCard.birthDate);
+    fromLabel.textContent = guestForCard.fromPlace || defaultFromPlace;
+    toLabel.textContent = guestForCard.toPlace || defaultToPlace;
     welcome.classList.add("is-leaving");
     delivery.classList.add("is-visible");
     delivery.setAttribute("aria-hidden", "false");
-    statusTimer = later(() => {
-      deliveryStatus.textContent = `Đang đến gần ${initialGuest.toPlace || defaultToPlace}...`;
-    }, 3900);
-    deliveryTimer = later(finishDelivery, 6200);
+    startFlightAnimation();
   } else if (
     new URLSearchParams(window.location.search).get("view") === "card"
   ) {
@@ -596,6 +729,7 @@ export function initBirthdayExperience(
     abortController.abort();
     timers.forEach((timer) => clearTimeout(timer));
     cancelAnimationFrame(animationId);
+    cancelAnimationFrame(flightAnimationId);
     cancelAnimationFrame(micAnimationId);
     stopMicrophone(false);
     stopMusic();

@@ -53,7 +53,9 @@ const MARKUP = String.raw`
                 <span class="latitude latitude--one"></span>
                 <span class="latitude latitude--two"></span>
               </div>
-              <div class="route" aria-hidden="true"></div>
+              <svg class="route" viewBox="0 0 258 258" aria-hidden="true">
+                <path id="flightPath" pathLength="1"></path>
+              </svg>
               <div class="place place--a"><i><b>A</b></i><span id="fromLabel">Hà Nội, Việt Nam</span></div>
               <div class="place place--b"><i><b>B</b></i><span id="toLabel">Nhật Bản</span></div>
               <div class="flying-letter" aria-hidden="true"><span>♥</span></div>
@@ -99,7 +101,57 @@ const MARKUP = String.raw`
             </section>
 
             <section class="letter-panel letter-panel--bottom">
-              <div class="card__decor card__decor--two" aria-hidden="true"><span>✿</span><i>✦</i></div>
+              <div class="card__decor card__decor--two" aria-hidden="true">
+                <svg viewBox="0 0 56 56" xmlns="http://www.w3.org/2000/svg" focusable="false">
+                  <defs>
+                    <path id="petalStd" d="M0,0 C-7,-3.4 -9.6,-9.6 -4.8,-13.2 C-2.4,-14.8 0,-13.6 0,-11.4 C0,-13.6 2.4,-14.8 4.8,-13.2 C9.6,-9.6 7,-3.4 0,0 Z" />
+                    <path id="cloverStd" d="M0,0 C-5.6,-2.9 -6.6,-8.5 -2.9,-10.4 C-1.4,-11.3 0,-9.9 0,-8 C0,-9.9 1.4,-11.3 2.9,-10.4 C6.6,-8.5 5.6,-2.9 0,0 Z" />
+                    <linearGradient id="petalGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+                      <stop offset="0%" stop-color="#fff6ec" />
+                      <stop offset="45%" stop-color="#f3bfc9" />
+                      <stop offset="100%" stop-color="#d98aa0" />
+                    </linearGradient>
+                    <linearGradient id="cloverGrad" x1="0.5" y1="0" x2="0.5" y2="1">
+                      <stop offset="0%" stop-color="#bcd39a" />
+                      <stop offset="55%" stop-color="#7fa86f" />
+                      <stop offset="100%" stop-color="#547553" />
+                    </linearGradient>
+                    <radialGradient id="glowGrad" cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stop-color="#ffe9c7" stop-opacity="0.55" />
+                      <stop offset="100%" stop-color="#ffe9c7" stop-opacity="0" />
+                    </radialGradient>
+                  </defs>
+
+                  <path d="M32 52 C26 38 28 24 36 13" fill="none" stroke="var(--berry)" stroke-width="2" stroke-linecap="round" />
+                  <path d="M32 52 C24 49 15 47 10 45" fill="none" stroke="var(--berry)" stroke-width="1.6" stroke-linecap="round" />
+
+                  <circle cx="36" cy="12" r="11" fill="url(#glowGrad)" />
+
+                  <use href="#petalStd" transform="translate(36,12) rotate(0)" fill="url(#petalGrad)" />
+                  <use href="#petalStd" transform="translate(36,12) rotate(72)" fill="url(#petalGrad)" />
+                  <use href="#petalStd" transform="translate(36,12) rotate(144)" fill="url(#petalGrad)" />
+                  <use href="#petalStd" transform="translate(36,12) rotate(216)" fill="url(#petalGrad)" />
+                  <use href="#petalStd" transform="translate(36,12) rotate(288)" fill="url(#petalGrad)" />
+                  <circle cx="36" cy="12" r="1.6" fill="#b9506f" />
+                  <circle cx="39" cy="10" r="0.9" fill="var(--peach)" />
+                  <circle cx="39.2" cy="14" r="0.9" fill="var(--peach)" />
+                  <circle cx="36.4" cy="15.6" r="0.9" fill="var(--peach)" />
+                  <circle cx="33.2" cy="13" r="0.9" fill="var(--peach)" />
+                  <circle cx="33.8" cy="9.4" r="0.9" fill="#fff6ec" />
+
+                  <use href="#petalStd" transform="translate(24,30) rotate(-24) scale(0.42)" fill="url(#petalGrad)" opacity="0.65" />
+                  <use href="#petalStd" transform="translate(17,20) rotate(18) scale(0.3)" fill="url(#petalGrad)" opacity="0.55" />
+
+                  <path d="M45,3 L46.1,5.9 L49,7 L46.1,8.1 L45,11 L43.9,8.1 L41,7 L43.9,5.9 Z" fill="var(--peach)" opacity="0.9" />
+
+                  <use href="#cloverStd" transform="translate(10,44) rotate(0)" fill="url(#cloverGrad)" />
+                  <use href="#cloverStd" transform="translate(10,44) rotate(90)" fill="url(#cloverGrad)" />
+                  <use href="#cloverStd" transform="translate(10,44) rotate(180)" fill="url(#cloverGrad)" />
+                  <use href="#cloverStd" transform="translate(10,44) rotate(270)" fill="url(#cloverGrad)" />
+                  <path d="M10,44 L10,38.6 M10,44 L10,49.4 M10,44 L4.6,44 M10,44 L15.4,44" stroke="var(--peach)" stroke-width="0.5" opacity="0.7" />
+                  <circle cx="10" cy="44" r="1.1" fill="#3f5c3d" />
+                </svg>
+              </div>
               <p class="closing-note">Mong tuổi mới sẽ dịu dàng với bạn như một ngày trời trong.</p>
               <div class="letter-closing">
                 <p class="best-wishes">Best wishes,</p>
@@ -186,6 +238,8 @@ export function VanillaBirthdayExperience({
   const hostRef = useRef<HTMLDivElement>(null);
   const setUser = useAppStore((state) => state.setUser);
   const router = useRouter();
+  const isBypassGuestFormEnabled =
+    process.env.NEXT_PUBLIC_BYPASS_GUEST_FORM === "true";
 
   useEffect(() => {
     const host = hostRef.current;
@@ -204,13 +258,14 @@ export function VanillaBirthdayExperience({
         return submitRegistration(values);
       },
       initialGuest,
+      isBypassGuestFormEnabled,
     });
 
     return () => {
       dispose();
       shadow.innerHTML = "";
     };
-  }, [initialGuest, router, setUser]);
+  }, [initialGuest, isBypassGuestFormEnabled, router, setUser]);
 
   return <div ref={hostRef} className="min-h-dvh" />;
 }
