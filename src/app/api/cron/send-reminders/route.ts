@@ -32,7 +32,7 @@ function getSiteUrl() {
   if (configured) return configured;
   return process.env.VERCEL_PROJECT_PRODUCTION_URL
     ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-    : "http://localhost:3000";
+    : "http://localhost:4000";
 }
 
 async function ensureInvite(

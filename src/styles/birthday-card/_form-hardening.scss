@@ -1,0 +1,38 @@
+
+.birthday-root {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+
+  button,
+  input,
+  textarea {
+    font: inherit;
+  }
+}
+.registration-error {
+  grid-column: 1 / -1;
+  margin: 0;
+  color: #b4233a;
+  font-size: 11px;
+  text-align: center;
+}
+.enter-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.enter-button.is-loading::before {
+  content: "";
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  border-top-color: #fff;
+  animation: enter-button-spin 0.7s linear infinite;
+}
+@keyframes enter-button-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

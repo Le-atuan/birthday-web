@@ -1,0 +1,67 @@
+:host {
+  --ink: #12304a;
+  --berry: #267cb3;
+  --pink: #72c7f2;
+  --peach: #ffd37a;
+  --cream: #ddf4ff;
+  --paper: #f8fcff;
+  --shadow: rgba(18, 48, 74, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+:host,
+.birthday-root {
+  min-height: 100%;
+}
+
+.birthday-root {
+  margin: 0;
+  overflow-x: hidden;
+  color: var(--ink);
+  font-family: "DM Sans", sans-serif;
+  background:
+    radial-gradient(
+      ellipse at 14% 19%,
+      rgba(255, 255, 255, 0.78) 0 8%,
+      transparent 8.5%
+    ),
+    radial-gradient(
+      ellipse at 83% 15%,
+      rgba(255, 255, 255, 0.62) 0 10%,
+      transparent 10.5%
+    ),
+    linear-gradient(155deg, #bfeaff 0%, #72c7f2 52%, #a9e0fa 100%);
+
+  &::before,
+  &::after {
+    content: "";
+    position: fixed;
+    width: 32vw;
+    aspect-ratio: 1;
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  &::before {
+    top: -19vw;
+    left: -9vw;
+    box-shadow: 0 0 0 5vw rgba(255, 255, 255, 0.13);
+  }
+  &::after {
+    right: -17vw;
+    bottom: -17vw;
+    box-shadow: 0 0 0 6vw rgba(255, 255, 255, 0.1);
+  }
+
+  #confetti {
+    position: fixed;
+    inset: 0;
+    z-index: 20;
+    pointer-events: none;
+  }
+}
+

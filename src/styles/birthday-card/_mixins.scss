@@ -1,0 +1,15 @@
+// Shared SCSS mixins for the birthday-card partials.
+
+// The "weight size DM Sans[, sans-serif]" shorthand repeats across several
+// components (buttons, labels, badges). $fallback: true reproduces the
+// multi-line `font: N Npx "DM Sans", sans-serif;` form used on inputs/CTAs;
+// the default reproduces the single-line form with no fallback family.
+@mixin dm-sans($weight, $size, $fallback: false) {
+  @if $fallback {
+    font:
+      #{$weight} #{$size} "DM Sans",
+      sans-serif;
+  } @else {
+    font: #{$weight} #{$size} "DM Sans";
+  }
+}

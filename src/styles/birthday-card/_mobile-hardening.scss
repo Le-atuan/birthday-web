@@ -1,0 +1,354 @@
+/* Mobile-first hardening -------------------------------------------------- */
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100dvh;
+}
+
+.birthday-root {
+  min-height: 100dvh;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+
+  button,
+  input,
+  textarea {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button:active {
+    opacity: 0.82;
+  }
+}
+
+@media (max-width: 767px) {
+  .welcome,
+  .delivery {
+    min-height: 100dvh;
+    padding: max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+    align-items: safe center;
+  }
+
+  .welcome__card {
+    width: min(100%, 480px);
+    margin-block: auto;
+    padding: 22px 16px 18px;
+    border-radius: 20px;
+  }
+
+  .welcome__eyebrow {
+    margin-bottom: 8px;
+    font-size: 9px;
+  }
+
+  .welcome__title {
+    font-size: clamp(38px, 13vw, 52px);
+  }
+
+  .welcome__intro {
+    margin: 10px 0 18px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .guest-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .field,
+  .field--wide,
+  .enter-button {
+    grid-column: 1;
+  }
+
+  .field {
+    gap: 5px;
+  }
+
+  .field span {
+    font-size: 11px;
+  }
+
+  .field input {
+    min-height: 48px;
+    border-radius: 12px;
+    padding-inline: 13px;
+    font-size: 16px;
+  }
+
+  .enter-button {
+    min-height: 50px;
+    margin-top: 3px;
+    font-size: 13px;
+  }
+
+  .privacy-note {
+    margin-top: 11px;
+    font-size: 10px;
+    line-height: 1.45;
+  }
+
+  .delivery__content {
+    width: min(100%, 390px);
+  }
+
+  .delivery h2 {
+    margin-bottom: 8px;
+    font-size: clamp(21px, 7vw, 28px);
+  }
+
+  .flight {
+    width: min(330px, 100%);
+    height: clamp(245px, 72vw, 280px);
+    margin: 0 auto;
+    transform: none;
+  }
+
+  .globe {
+    width: min(258px, 76vw);
+  }
+
+  .delivery__progress {
+    width: min(280px, 78vw);
+    margin-top: -4px;
+  }
+
+  .skip-button {
+    min-width: 136px;
+    min-height: 44px;
+    margin-top: 8px;
+    border-bottom: 0;
+  }
+
+  .scene {
+    width: 100%;
+    min-height: max(100dvh, 580px);
+    padding: max(20px, env(safe-area-inset-top)) 12px
+      max(28px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .eyebrow {
+    margin-bottom: 42px;
+    font-size: 9px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .envelope {
+    width: min(100%, 430px);
+    height: clamp(220px, 61vw, 270px);
+    min-height: 0;
+  }
+
+  .card {
+    inset: 5% 3%;
+    padding: 18px 12px 16px;
+  }
+
+  .envelope.open .card {
+    bottom: auto;
+    min-height: min(310px, 51dvh);
+    transform: translateY(-32%) scale(1);
+  }
+
+  .card h1 {
+    font-size: clamp(34px, 12vw, 48px);
+  }
+
+  .message {
+    margin: 8px 0 3px;
+    font-size: clamp(11px, 3.45vw, 14px);
+    line-height: 1.45;
+  }
+
+  .signature {
+    font-size: clamp(17px, 5.3vw, 22px);
+  }
+
+  .wish-button {
+    min-height: 44px;
+    margin-top: 5px;
+    padding-inline: 16px;
+  }
+
+  .mini-disc {
+    right: 10px;
+    top: 10px;
+    width: 46px;
+    min-width: 46px;
+    min-height: 46px;
+  }
+
+  .seal {
+    width: 84px;
+    min-width: 84px;
+    min-height: 84px;
+  }
+
+  .hint {
+    margin-top: 14px;
+    padding-inline: 12px;
+    font-size: 12px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  .wish-space {
+    min-height: 100dvh;
+    padding: max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(12px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .wish-panel {
+    width: min(100%, 460px);
+    max-height: calc(
+      100dvh - max(24px, env(safe-area-inset-top) + env(safe-area-inset-bottom))
+    );
+    padding: 26px 16px 20px;
+    border-radius: 20px;
+    overscroll-behavior: contain;
+  }
+
+  .wish-close {
+    top: max(10px, env(safe-area-inset-top));
+    right: max(10px, env(safe-area-inset-right));
+    width: 44px;
+    min-height: 44px;
+  }
+
+  .wish-field textarea {
+    min-height: 112px;
+    font-size: 16px;
+  }
+
+  .wish-primary,
+  .wish-secondary {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .wish-actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .wish-cake {
+    margin-block: 0 -10px;
+    transform: scale(0.84);
+  }
+
+  .wish-star {
+    width: 64px;
+    min-width: 64px;
+    min-height: 64px;
+  }
+
+  .wish-memory {
+    bottom: max(16px, env(safe-area-inset-bottom));
+    width: calc(100% - 24px);
+  }
+}
+
+@media (max-width: 374px) {
+  .welcome__card {
+    padding: 18px 14px 14px;
+  }
+
+  .welcome__intro {
+    margin-bottom: 14px;
+  }
+
+  .guest-form {
+    gap: 8px;
+  }
+
+  .field input {
+    min-height: 44px;
+  }
+
+  .privacy-note {
+    display: none;
+  }
+
+  .flight {
+    height: 238px;
+  }
+
+  .globe {
+    width: 238px;
+  }
+
+  .eyebrow {
+    margin-bottom: 34px;
+  }
+
+  .envelope.open .card {
+    min-height: 292px;
+    transform: translateY(-29%) scale(1);
+  }
+}
+
+@media (max-height: 620px) and (orientation: portrait) {
+  .welcome {
+    place-items: start center;
+  }
+
+  .welcome__card {
+    margin-block: 0;
+  }
+
+  .scene {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .welcome,
+  .delivery {
+    place-items: start center;
+  }
+
+  .welcome__card {
+    width: min(680px, 100%);
+    margin-block: 0;
+  }
+
+  .guest-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .field,
+  .field--wide {
+    grid-column: auto;
+  }
+
+  .enter-button {
+    grid-column: 1 / -1;
+  }
+
+  .scene {
+    min-height: 600px;
+    justify-content: flex-start;
+  }
+
+  .wish-panel {
+    max-height: calc(100dvh - 20px);
+  }
+}
+
+@media (min-width: 768px) {
+  .birthday-root button,
+  .birthday-root input,
+  .birthday-root textarea {
+    touch-action: auto;
+  }
+}
+

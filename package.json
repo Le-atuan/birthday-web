@@ -3,10 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently -n next,scss -c blue,magenta \"next dev -p 4000\" \"pnpm run css:watch\"",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "css:build": "sass src/styles/birthday-card/index.scss public/birthday-card/style.css --no-source-map --no-charset --style=expanded",
+    "css:watch": "sass --watch src/styles/birthday-card/index.scss:public/birthday-card/style.css --no-source-map --no-charset --style=expanded",
+    "predev": "pnpm run css:build",
+    "prebuild": "pnpm run css:build"
   },
   "dependencies": {
     "@react-email/components": "^1.0.12",
@@ -29,10 +33,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "concurrently": "^10.0.5",
     "eslint": "^9",
     "eslint-config-next": "16.3.1",
     "prettier": "^3.9.6",
     "prettier-plugin-tailwindcss": "^0.8.1",
+    "sass": "^1.102.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^5"
   },

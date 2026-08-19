@@ -1,0 +1,197 @@
+@media (max-width: 767px) {
+  .welcome,
+  .delivery {
+    min-height: 100dvh;
+    padding: max(12px, env(safe-area-inset-top))
+      max(12px, env(safe-area-inset-right))
+      max(16px, env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .welcome__card {
+    width: min(100%, 480px);
+    margin-block: auto;
+    padding: 22px 16px 18px;
+    border-radius: 20px;
+  }
+  .welcome__title {
+    font-size: clamp(38px, 13vw, 52px);
+  }
+  .welcome__intro {
+    margin: 10px 0 18px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .guest-form {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .field,
+  .field--wide,
+  .enter-button {
+    grid-column: 1;
+  }
+  .field input {
+    min-height: 48px;
+    padding-inline: 13px;
+    font-size: 16px;
+  }
+  .enter-button {
+    min-height: 50px;
+  }
+
+  .delivery h2 {
+    margin-bottom: 8px;
+  }
+  .flight {
+    width: min(330px, 100%);
+    height: clamp(245px, 72vw, 280px);
+    margin: 0 auto;
+    transform: none;
+  }
+  .globe {
+    width: min(258px, 76vw);
+  }
+  .skip-button {
+    min-width: 136px;
+    min-height: 44px;
+    margin-top: 8px;
+    border-bottom: 0;
+  }
+
+  .scene {
+    width: 100%;
+    min-height: max(100dvh, 600px);
+    padding: max(20px, env(safe-area-inset-top)) 12px
+      max(28px, env(safe-area-inset-bottom));
+    overflow-y: auto;
+  }
+
+  .eyebrow {
+    margin-bottom: 38px;
+    font-size: 9px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  .envelope {
+    width: min(100%, 430px);
+    height: clamp(210px, 58vw, 250px);
+    min-height: 0;
+  }
+  .envelope.open .card {
+    width: min(calc(100vw - 24px), 50.9dvh);
+    height: auto;
+    min-height: 0;
+  }
+  .letter-panel {
+    padding: clamp(10px, 3vw, 16px);
+  }
+  .letter-panel--top h1 {
+    font-size: clamp(32px, 11vw, 46px);
+  }
+  .letter-panel .card__kicker {
+    max-width: calc(100% - 76px);
+    font-size: 9px;
+    line-height: 1.35;
+  }
+  .letter-panel .birthday-line {
+    margin-top: 5px;
+    font-size: 8px;
+  }
+  .letter-panel .message {
+    width: 94%;
+    font-size: clamp(11px, 3.25vw, 13px);
+    line-height: 1.45;
+  }
+  .letter-panel .message--second {
+    margin-top: 7px;
+  }
+  .letter-panel--bottom .wish-button {
+    min-height: 44px;
+    padding: 7px 14px;
+  }
+  .letter-closing .signature {
+    font-size: clamp(18px, 5.3vw, 23px);
+  }
+  .card .mini-disc {
+    right: 9px;
+    top: 9px;
+    width: 46px;
+    min-width: 46px;
+    min-height: 46px;
+  }
+  .seal {
+    min-width: 84px;
+    min-height: 84px;
+  }
+
+  .wish-panel {
+    max-height: calc(100dvh - 24px);
+    padding: 26px 16px 20px;
+  }
+  .wish-close {
+    width: 44px;
+    min-height: 44px;
+  }
+  .wish-field textarea {
+    font-size: 16px;
+  }
+  .wish-primary,
+  .wish-secondary {
+    width: 100%;
+    min-height: 48px;
+  }
+}
+
+@media (max-width: 374px), (max-height: 620px) and (orientation: portrait) {
+  .scene {
+    min-height: max(100dvh, 560px);
+  }
+  .eyebrow {
+    margin-bottom: 24px;
+  }
+  .envelope.open .card {
+    width: min(calc(100vw - 20px), 49.5dvh);
+  }
+  .letter-panel {
+    padding: 8px 10px;
+  }
+  .letter-panel--top h1 {
+    font-size: clamp(29px, 10.5vw, 39px);
+  }
+  .letter-panel .message {
+    font-size: clamp(10.5px, 3.1vw, 12px);
+    line-height: 1.38;
+  }
+  .letter-panel .message--second {
+    margin-top: 5px;
+  }
+}
+
+@media (max-height: 520px) and (orientation: landscape) {
+  .scene {
+    min-height: 640px;
+    justify-content: flex-start;
+  }
+  .envelope.open .card {
+    width: min(417px, calc(100vw - 80px));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .letter-panel {
+    transition: none !important;
+  }
+  .envelope.open .letter-panel {
+    transform: none !important;
+  }
+  .wishes-route .wishes-route__star.is-flying {
+    animation-duration: 0.01ms !important;
+  }
+  .wishes-route .wishes-route__star.is-flying span::before,
+  .wishes-route .wishes-route__star.is-flying span::after {
+    animation: none !important;
+  }
+}
+

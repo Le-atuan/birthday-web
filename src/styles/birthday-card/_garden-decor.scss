@@ -1,0 +1,453 @@
+/* Header confetti controls and Japanese sky garden. */
+.birthday-root {
+  .letter-panel--top {
+    overflow: hidden;
+  }
+
+  #confetti.header-confetti {
+    position: absolute;
+    z-index: 5;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  .confetti-trigger {
+    position: absolute;
+    z-index: 6;
+    bottom: clamp(4px, 3%, 12px);
+    display: grid;
+    width: clamp(46px, 12vw, 58px);
+    height: clamp(46px, 12vw, 58px);
+    place-items: center;
+    border: 0;
+    border-radius: 16px;
+    padding: 3px;
+    background: transparent;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition:
+      opacity 0.34s ease,
+      filter 0.2s ease,
+      transform 0.18s ease;
+  }
+
+  .confetti-trigger--left {
+    left: clamp(4px, 2.5%, 14px);
+  }
+
+  .confetti-trigger--right {
+    right: clamp(4px, 2.5%, 14px);
+  }
+
+  .confetti-trigger__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-5deg);
+  }
+
+  .confetti-trigger--right .confetti-trigger__art {
+    transform: scaleX(-1) rotate(-5deg);
+  }
+
+  .confetti-trigger img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 4px 5px rgba(18, 48, 74, 0.16));
+  }
+
+  .confetti-trigger:hover {
+    filter: brightness(1.08) saturate(1.08);
+  }
+
+  .confetti-trigger:focus-visible {
+    outline: 2px solid var(--berry);
+    outline-offset: 2px;
+  }
+
+  .confetti-trigger:active img {
+    transform: scale(0.9);
+  }
+
+  .envelope.open .confetti-trigger img {
+    animation: birthday-confetti-icon-idle 3.2s 1.65s ease-in-out infinite;
+  }
+
+  .envelope.open .confetti-trigger.is-firing img {
+    animation: birthday-confetti-icon-fire 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
+@keyframes birthday-confetti-icon-idle {
+  0%,
+  12%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  3% {
+    transform: translate(-2px, 1px) scale(0.98);
+  }
+  6% {
+    transform: translate(2px, -1px) scale(1.01);
+  }
+  9% {
+    transform: translate(-1px, 0) scale(1);
+  }
+}
+
+@keyframes birthday-confetti-icon-fire {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(1);
+  }
+  20% {
+    transform: translate(-3px, 3px) scale(0.9);
+  }
+  42% {
+    transform: translate(2px, -3px) scale(1.06);
+  }
+  65% {
+    transform: translate(-1px, 1px) scale(0.98);
+  }
+}
+
+.birthday-root {
+  .letter-panel--bottom > :not(.bottom-botanicals) {
+    position: relative;
+    z-index: 3;
+  }
+
+  .envelope.open .letter-panel--bottom > :not(.bottom-botanicals) {
+    transition-delay: 1.3s;
+  }
+
+  .bottom-botanicals {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    overflow: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(7px);
+    transition:
+      opacity 0.34s ease,
+      transform 0.42s cubic-bezier(0.2, 0.75, 0.2, 1);
+  }
+
+  .envelope.open .bottom-botanicals {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 1.38s;
+  }
+
+  .garden-glow {
+    position: absolute;
+    right: 8%;
+    bottom: -42%;
+    width: 70%;
+    height: 82%;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse,
+      rgba(255, 211, 122, 0.17),
+      rgba(114, 199, 242, 0.08) 46%,
+      transparent 72%
+    );
+  }
+
+  .cloud-garden {
+    position: absolute;
+    bottom: -3px;
+    height: 34px;
+    opacity: 0.58;
+    filter: drop-shadow(0 -4px 10px rgba(114, 199, 242, 0.1));
+  }
+
+  .cloud-garden--left {
+    left: -13px;
+    width: 47%;
+  }
+
+  .cloud-garden--right {
+    right: -18px;
+    width: 40%;
+    transform: scale(0.82);
+    transform-origin: right bottom;
+  }
+
+  .cloud-garden i {
+    position: absolute;
+    bottom: 0;
+    border-radius: 50% 50% 0 0;
+    background: linear-gradient(
+      180deg,
+      rgba(223, 246, 255, 0.95),
+      rgba(188, 230, 250, 0.72)
+    );
+
+    &:nth-child(1) {
+      left: 0;
+      width: 50%;
+      height: 20px;
+    }
+
+    &:nth-child(2) {
+      left: 28%;
+      width: 48%;
+      height: 34px;
+    }
+
+    &:nth-child(3) {
+      right: 0;
+      width: 48%;
+      height: 24px;
+    }
+  }
+
+  .sakura-branch {
+    --branch-rotate: -8deg;
+    position: absolute;
+    height: 58px;
+    border-top: 2px solid rgba(112, 74, 68, 0.42);
+    border-radius: 52% 48% 0 0;
+    opacity: 0;
+    transform: rotate(var(--branch-rotate)) scale(0.82);
+    transform-origin: left center;
+  }
+
+  .sakura-branch--main {
+    left: -16px;
+    bottom: 17px;
+    width: 59%;
+  }
+
+  .sakura-branch--signature {
+    --branch-rotate: 8deg;
+    right: -24px;
+    bottom: 9px;
+    width: 39%;
+    transform-origin: right center;
+  }
+
+  .sakura-branch::before,
+  .sakura-branch::after {
+    content: "";
+    position: absolute;
+    width: 42%;
+    border-top: 1px solid rgba(112, 74, 68, 0.34);
+    transform-origin: left;
+  }
+
+  .sakura-branch::before {
+    left: 30%;
+    top: -1px;
+    transform: rotate(-27deg);
+  }
+
+  .sakura-branch::after {
+    left: 57%;
+    top: 1px;
+    transform: rotate(22deg);
+  }
+
+  .sakura-branch--signature::before {
+    left: 18%;
+    transform: rotate(-20deg);
+  }
+
+  .sakura-branch--signature::after {
+    left: 50%;
+    transform: rotate(25deg);
+  }
+
+  .sakura-branch span {
+    position: absolute;
+    width: clamp(13px, 3.7vw, 19px);
+    aspect-ratio: 1;
+    background:
+      radial-gradient(ellipse at 50% 17%, #ffd7e3 0 24%, transparent 26%),
+      radial-gradient(ellipse at 83% 43%, #f8b8cc 0 24%, transparent 26%),
+      radial-gradient(ellipse at 70% 82%, #ffd4e0 0 24%, transparent 26%),
+      radial-gradient(ellipse at 28% 82%, #f4a9c0 0 24%, transparent 26%),
+      radial-gradient(ellipse at 17% 43%, #ffd9e4 0 24%, transparent 26%),
+      radial-gradient(circle, #f0a35f 0 12%, transparent 14%);
+    filter: drop-shadow(0 2px 2px rgba(117, 67, 82, 0.14));
+  }
+
+  .sakura-branch--main span {
+    &:nth-child(1) {
+      left: 20%;
+      top: -16px;
+    }
+    &:nth-child(2) {
+      left: 38%;
+      top: -28px;
+      transform: scale(0.78) rotate(15deg);
+    }
+    &:nth-child(3) {
+      left: 57%;
+      top: -12px;
+      transform: scale(0.9);
+    }
+    &:nth-child(4) {
+      left: 72%;
+      top: 5px;
+      transform: scale(0.68);
+    }
+    &:nth-child(5) {
+      left: 84%;
+      top: -7px;
+      transform: scale(0.82) rotate(-12deg);
+    }
+  }
+  .sakura-branch--signature span {
+    &:nth-child(1) {
+      left: 12%;
+      top: -13px;
+      transform: scale(0.72);
+    }
+    &:nth-child(2) {
+      left: 43%;
+      top: -22px;
+      transform: scale(0.88);
+    }
+    &:nth-child(3) {
+      left: 68%;
+      top: -4px;
+      transform: scale(0.66);
+    }
+  }
+
+  .garden-sparkles i {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: #ffd37a;
+    box-shadow: 0 0 7px rgba(255, 211, 122, 0.72);
+    opacity: 0.72;
+
+    &:nth-child(1) {
+      left: 15%;
+      top: 20%;
+    }
+    &:nth-child(2) {
+      left: 45%;
+      top: 52%;
+      transform: scale(0.7);
+    }
+    &:nth-child(3) {
+      right: 30%;
+      top: 23%;
+      transform: scale(0.8);
+    }
+    &:nth-child(4) {
+      right: 11%;
+      top: 48%;
+    }
+  }
+
+  .falling-petals i {
+    position: absolute;
+    width: 7px;
+    height: 4px;
+    border-radius: 80% 15% 75% 20%;
+    background: linear-gradient(135deg, #ffdbe5, #efa5bc);
+    opacity: 0;
+
+    &:nth-child(1) {
+      left: 47%;
+      top: 23%;
+      --petal-x: 9px;
+      --petal-rotate: 92deg;
+    }
+    &:nth-child(2) {
+      left: 58%;
+      top: 47%;
+      --petal-x: -6px;
+      --petal-rotate: 150deg;
+      transform: scale(0.72);
+    }
+    &:nth-child(3) {
+      right: 23%;
+      top: 28%;
+      --petal-x: 7px;
+      --petal-rotate: 115deg;
+      transform: scale(0.82);
+    }
+  }
+
+  .envelope.open .sakura-branch {
+    animation: birthday-garden-branch-bloom 0.72s 1.38s
+      cubic-bezier(0.2, 0.78, 0.2, 1) forwards;
+  }
+
+  .envelope.open .sakura-branch--signature {
+    animation-delay: 1.47s;
+  }
+
+  .envelope.open .falling-petals i {
+    animation: birthday-garden-petal-drift 1.25s 1.49s ease-out forwards;
+
+    &:nth-child(2) {
+      animation-delay: 1.62s;
+    }
+    &:nth-child(3) {
+      animation-delay: 1.72s;
+    }
+  }
+}
+
+@keyframes birthday-garden-branch-bloom {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+    transform: rotate(var(--branch-rotate)) scale(0.82);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: rotate(var(--branch-rotate)) scale(1);
+  }
+}
+
+@keyframes birthday-garden-petal-drift {
+  0% {
+    opacity: 0;
+    transform: translate(0, -5px) rotate(0deg);
+  }
+  24% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0.68;
+    transform: translate(var(--petal-x), 11px) rotate(var(--petal-rotate));
+  }
+}
+
+.birthday-root {
+  .letter-panel--bottom .closing-note {
+    width: min(82%, 340px);
+    margin: 0 auto 14px;
+    text-align: center;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .envelope.open .confetti-trigger img {
+      animation: none !important;
+    }
+    .envelope.open .confetti-trigger.is-firing img {
+      animation: birthday-confetti-icon-fire 0.01ms linear !important;
+    }
+    .envelope.open .sakura-branch,
+    .envelope.open .falling-petals i {
+      animation-delay: 0s !important;
+    }
+  }
+}

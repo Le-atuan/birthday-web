@@ -58,6 +58,7 @@ export function initBirthdayExperience(
   const wishMemory = root.querySelector("#wishMemory");
   const viewStarButton = root.querySelector("#viewStarButton");
   const canvas = root.querySelector("#confetti");
+  const confettiTriggers = [...root.querySelectorAll(".confetti-trigger")];
   const ctx = canvas.getContext("2d");
   if (!ctx) return () => {};
 
@@ -68,16 +69,17 @@ export function initBirthdayExperience(
   let audioContext;
   let isPlaying = false;
   let tuneTimer;
+  let musicStartTimer;
+  let isHeaderMusicReady = false;
   let micStream;
   let micContext;
   let micAnimationId;
   let resumeMusicAfterMic = false;
   let activeWish = "";
   let previousFocus;
-  let isRaining = false;
-  let lastRainDrop = 0;
+  let lastConfettiBurst = -Infinity;
   let isSubmittingGuestForm = false;
-  const colors = ["#12304a", "#267cb3", "#72c7f2", "#ffd37a", "#f8fcff"];
+  const colors = ["#7c3aed", "#ff3d71", "#35d07f", "#ff5733", "#9d174d"];
   const defaultFromPlace = "Hà Nội, Việt Nam";
   const defaultToPlace = "Nhật Bản";
   const globeSize = 258;
@@ -170,60 +172,54 @@ export function initBirthdayExperience(
   }
 
   function resizeCanvas() {
+    const bounds = canvas.getBoundingClientRect();
+    const width = Math.max(1, bounds.width);
+    const height = Math.max(1, bounds.height);
     const ratio = Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = window.innerWidth * ratio;
-    canvas.height = window.innerHeight * ratio;
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
+    canvas.width = width * ratio;
+    canvas.height = height * ratio;
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    return { width, height };
   }
 
-  function burst(amount = 150) {
+  function burst(amount = 58, origin, direction = 0) {
+    const reduceMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+    const bounds = resizeCanvas();
+    const particleCount = reduceMotion ? Math.min(22, amount) : amount;
+    const start = origin || { x: bounds.width / 2, y: bounds.height * 0.72 };
     pieces.push(
-      ...Array.from({ length: amount }, () => ({
-        x: window.innerWidth / 2 + (Math.random() - 0.5) * 120,
-        y: window.innerHeight * 0.38,
-        vx: (Math.random() - 0.5) * 12,
-        vy: Math.random() * -10 - 3,
-        gravity: 0.16 + Math.random() * 0.08,
+      ...Array.from({ length: particleCount }, () => ({
+        x: start.x + (Math.random() - 0.5) * 20,
+        y: start.y + (Math.random() - 0.5) * 8,
+        vx: direction
+          ? direction * (1.4 + Math.random() * (reduceMotion ? 2.3 : 4.6)) +
+            (Math.random() - 0.5) * 1.2
+          : (Math.random() - 0.5) * (reduceMotion ? 4.2 : 8.5),
+        vy: Math.random() * (reduceMotion ? -3 : -6.5) - 1.5,
+        gravity: 0.11 + Math.random() * 0.06,
         rotation: Math.random() * Math.PI,
         spin: (Math.random() - 0.5) * 0.25,
-        size: 5 + Math.random() * 7,
+        size: 3 + Math.random() * 5,
         color: colors[Math.floor(Math.random() * colors.length)],
         life: 1,
       })),
     );
+    if (!animationId) animationId = requestAnimationFrame(drawConfetti);
   }
 
-  function addRain() {
-    pieces.push({
-      x: Math.random() * window.innerWidth,
-      y: -15,
-      vx: (Math.random() - 0.5) * 1.1,
-      vy: 1.1 + Math.random() * 1.7,
-      gravity: 0.004,
-      rotation: Math.random() * Math.PI,
-      spin: (Math.random() - 0.5) * 0.06,
-      size: 4 + Math.random() * 6,
-      color: colors[Math.floor(Math.random() * colors.length)],
-      life: 1.8,
-    });
-  }
-
-  function drawConfetti(time = 0) {
-    ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-    if (isRaining && time - lastRainDrop > 85) {
-      addRain();
-      if (Math.random() > 0.5) addRain();
-      lastRainDrop = time;
-    }
+  function drawConfetti() {
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    ctx.clearRect(0, 0, width, height);
     pieces.forEach((piece) => {
       piece.x += piece.vx;
       piece.y += piece.vy;
       piece.vy += piece.gravity;
       piece.vx *= 0.995;
       piece.rotation += piece.spin;
-      piece.life -= isRaining && piece.gravity < 0.01 ? 0.0008 : 0.006;
+      piece.life -= 0.018;
 
       ctx.save();
       ctx.globalAlpha = Math.max(piece.life, 0);
@@ -239,9 +235,42 @@ export function initBirthdayExperience(
       ctx.restore();
     });
     pieces = pieces.filter(
-      (piece) => piece.life > 0 && piece.y < window.innerHeight + 30,
+      (piece) => piece.life > 0 && piece.y > -24 && piece.y < height + 24,
     );
-    animationId = requestAnimationFrame(drawConfetti);
+    if (pieces.length) {
+      animationId = requestAnimationFrame(drawConfetti);
+    } else {
+      animationId = null;
+      ctx.clearRect(0, 0, width, height);
+    }
+  }
+
+  function triggerHeaderConfetti() {
+    const now = performance.now();
+    if (now - lastConfettiBurst < 500) return;
+    lastConfettiBurst = now;
+    const canvasBounds = canvas.getBoundingClientRect();
+    confettiTriggers.forEach((trigger, index) => {
+      const triggerBounds = trigger.getBoundingClientRect();
+      trigger.classList.remove("is-firing");
+      void trigger.offsetWidth;
+      trigger.classList.add("is-firing");
+      burst(
+        38,
+        {
+          x: triggerBounds.left - canvasBounds.left + triggerBounds.width / 2,
+          y: triggerBounds.top - canvasBounds.top + triggerBounds.height * 0.35,
+        },
+        index === 0 ? 1 : -1,
+      );
+    });
+    later(
+      () =>
+        confettiTriggers.forEach((trigger) =>
+          trigger.classList.remove("is-firing"),
+        ),
+      520,
+    );
   }
 
   function openCard() {
@@ -249,6 +278,15 @@ export function initBirthdayExperience(
       "(prefers-reduced-motion: reduce)",
     ).matches;
     const unfoldDuration = reduceMotion ? 40 : 2500;
+    const headerRevealDelay = reduceMotion ? 40 : 200;
+    isHeaderMusicReady = false;
+    prepareMusicFromGesture();
+    clearTimeout(musicStartTimer);
+    musicStartTimer = later(() => {
+      isHeaderMusicReady = true;
+      startMusic();
+      triggerHeaderConfetti();
+    }, headerRevealDelay);
     card.setAttribute("aria-busy", "true");
     envelope.classList.add("open");
     openButton.setAttribute("aria-expanded", "true");
@@ -256,7 +294,6 @@ export function initBirthdayExperience(
     later(() => {
       card.setAttribute("aria-busy", "false");
       card.classList.add("is-unfolded");
-      isRaining = true;
       card.scrollIntoView({
         behavior: reduceMotion ? "auto" : "smooth",
         block: "center",
@@ -273,7 +310,6 @@ export function initBirthdayExperience(
     wishSpace.classList.remove("is-visible");
     wishSpace.setAttribute("aria-hidden", "true");
     document.body.style.overflow = "";
-    isRaining = true;
     wishMemory.hidden = true;
     if (previousFocus) previousFocus.focus();
   }
@@ -540,7 +576,6 @@ export function initBirthdayExperience(
         delivery.classList.add("is-visible");
         delivery.setAttribute("aria-hidden", "false");
         startFlightAnimation();
-        startMusic();
       } catch {
         privacyNote.textContent = "Không thể lưu thông tin, vui lòng thử lại.";
         submitButton.disabled = false;
@@ -563,7 +598,6 @@ export function initBirthdayExperience(
     delivery.setAttribute("aria-hidden", "true");
     cardScene.classList.add("is-visible");
     cardScene.setAttribute("aria-hidden", "false");
-    later(() => burst(190), 220);
     later(() => openButton.focus(), 720);
   }
 
@@ -621,37 +655,70 @@ export function initBirthdayExperience(
     );
   }
 
+  function setMusicButtonState(playing) {
+    musicButton.classList.toggle("is-paused", !playing);
+    musicButton.querySelector(".mini-disc__status").textContent = playing
+      ? "Nhạc đang phát"
+      : "Nhạc đã dừng";
+    musicButton.setAttribute(
+      "aria-label",
+      playing ? "Tạm dừng nhạc" : "Phát nhạc",
+    );
+    musicButton.setAttribute("aria-pressed", String(!playing));
+  }
+
+  function prepareMusicFromGesture() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (!AudioContextClass) return false;
+    if (!audioContext || audioContext.state === "closed") {
+      audioContext = new AudioContextClass();
+    }
+    if (audioContext.state === "suspended") {
+      audioContext.resume().catch(() => {});
+    }
+    return true;
+  }
+
   function startMusic() {
-    if (isPlaying) return;
-    audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    isPlaying = true;
-    musicButton.classList.remove("is-paused");
-    musicButton.querySelector(".mini-disc__status").textContent =
-      "Nhạc đang phát";
-    musicButton.setAttribute("aria-label", "Tạm dừng nhạc");
-    musicButton.setAttribute("aria-pressed", "false");
-    scheduleBirthdayTune();
+    if (isPlaying || !prepareMusicFromGesture()) return;
+
+    const beginTune = () => {
+      if (isPlaying || !audioContext || audioContext.state === "closed") return;
+      isPlaying = true;
+      setMusicButtonState(true);
+      scheduleBirthdayTune();
+    };
+
+    if (audioContext.state === "running") {
+      beginTune();
+      return;
+    }
+
+    audioContext
+      .resume()
+      .then(beginTune)
+      .catch(() => setMusicButtonState(false));
   }
 
   function stopMusic() {
     isPlaying = false;
     clearTimeout(tuneTimer);
+    clearTimeout(musicStartTimer);
     if (audioContext) audioContext.close();
     audioContext = null;
-    musicButton.classList.add("is-paused");
-    musicButton.querySelector(".mini-disc__status").textContent =
-      "Nhạc đã dừng";
-    musicButton.setAttribute("aria-label", "Phát nhạc");
-    musicButton.setAttribute("aria-pressed", "true");
+    setMusicButtonState(false);
   }
 
   function toggleMusic() {
     if (isPlaying) stopMusic();
-    else startMusic();
+    else if (isHeaderMusicReady) startMusic();
   }
 
   openButton.addEventListener("click", openCard, { signal });
   musicButton.addEventListener("click", toggleMusic, { signal });
+  confettiTriggers.forEach((trigger) =>
+    trigger.addEventListener("click", triggerHeaderConfetti, { signal }),
+  );
   skipDelivery.addEventListener("click", finishDelivery, { signal });
   openWishButton.addEventListener("click", openWishSpace, { signal });
   closeWishButton.addEventListener("click", closeWishSpace, { signal });
@@ -685,7 +752,6 @@ export function initBirthdayExperience(
   resizeCanvas();
   updateFlightPath();
   positionLetter(0);
-  animationId = requestAnimationFrame(drawConfetti);
 
   const guestForCard =
     initialGuest ||

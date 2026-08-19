@@ -1,0 +1,22 @@
+// Compiled to public/birthday-card/style.css via `pnpm run css:build` / `pnpm run css:watch`.
+// Do NOT edit public/birthday-card/style.css by hand — edit these partials instead.
+//
+// Order matters: several selectors (.card, .envelope.open .card, .signature, .mini-disc,
+// .card__decor--two, .card::before...) are intentionally re-declared in a later partial to
+// override an earlier one. @use loads partials in the order listed below, which must match
+// the original file's top-to-bottom order or the cascade result changes.
+
+@use "tokens";
+@use "mixins";
+@use "welcome";
+@use "delivery";
+@use "envelope-card";
+@use "chrome-controls";
+@use "wish-space";
+@use "responsive-early";
+@use "wishes-route";
+@use "form-hardening";
+@use "mobile-hardening";
+@use "letter-accordion";
+@use "letter-accordion-responsive";
+@use "garden-decor";

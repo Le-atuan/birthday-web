@@ -1,0 +1,104 @@
+@media (max-width: 520px) {
+  .welcome {
+    padding: 14px;
+  }
+  .welcome__card {
+    padding: 27px 20px;
+    border-radius: 22px;
+  }
+  .guest-form {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .field,
+  .field--wide,
+  .enter-button {
+    grid-column: 1;
+  }
+  .scene {
+    min-height: max(100dvh, 620px);
+    justify-content: center;
+    padding: 28px 14px 36px;
+  }
+  .eyebrow {
+    margin-bottom: 56px;
+    font-size: 9px;
+  }
+  .envelope {
+    width: min(580px, calc(100vw - 28px));
+    min-height: 235px;
+    height: 57vw;
+  }
+  .card {
+    inset: 5% 4%;
+    padding: 18px 13px;
+  }
+  .envelope.open .card {
+    bottom: auto;
+    min-height: 300px;
+    transform: translateY(-34%) scale(1);
+  }
+  .message {
+    margin-top: 9px;
+  }
+  .card__decor--one {
+    top: 14px;
+    left: 15px;
+  }
+  .card__decor--two {
+    right: 15px;
+    bottom: 12px;
+  }
+  .mini-disc {
+    right: 12px;
+    top: 11px;
+    width: 44px;
+  }
+  .flight {
+    transform: scale(0.92);
+    margin-block: -10px;
+  }
+  .wish-panel {
+    max-height: calc(100vh - 34px);
+    padding: 28px 19px;
+    border-radius: 22px;
+  }
+  .wish-close {
+    top: max(10px, env(safe-area-inset-top));
+    right: 10px;
+    width: 38px;
+  }
+  .wish-cake {
+    transform: scale(0.9);
+    margin-block: 2px -7px;
+  }
+  .wish-actions {
+    display: grid;
+  }
+  .wish-primary,
+  .wish-secondary {
+    width: 100%;
+  }
+  .wish-star {
+    width: 61px;
+  }
+  .wish-star span {
+    font-size: 46px;
+  }
+}
+
+@media (max-width: 767px) {
+  .mini-disc__status {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

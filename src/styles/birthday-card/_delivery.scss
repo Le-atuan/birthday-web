@@ -1,0 +1,345 @@
+@use "mixins";
+
+.delivery {
+  z-index: 28;
+  color: #f9f5ef;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(68, 116, 150, 0.38),
+      transparent 34%
+    ),
+    radial-gradient(
+      circle at 18% 20%,
+      rgba(255, 255, 255, 0.75) 0 1px,
+      transparent 2px
+    ),
+    radial-gradient(
+      circle at 78% 25%,
+      rgba(255, 255, 255, 0.65) 0 1.5px,
+      transparent 2.5px
+    ),
+    radial-gradient(
+      circle at 88% 75%,
+      rgba(255, 255, 255, 0.5) 0 1px,
+      transparent 2px
+    ),
+    linear-gradient(160deg, #172333, #293d52 58%, #15202d);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.delivery.is-visible {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.delivery.is-leaving {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+.delivery__content {
+  width: min(460px, 100%);
+  text-align: center;
+}
+.delivery__eyebrow {
+  margin: 0 0 8px;
+  color: #f5b1bd;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+.delivery h2 {
+  max-width: 380px;
+  margin: 0 auto 20px;
+  font-family: Georgia, serif;
+  font-size: clamp(22px, 6vw, 32px);
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.flight {
+  position: relative;
+  width: min(350px, 88vw);
+  height: 290px;
+  margin: 0 auto;
+}
+.globe {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 258px;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.32);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 25%,
+    #75b8cf,
+    #36738f 58%,
+    #183e59 100%
+  );
+  box-shadow:
+    inset -25px -18px 40px rgba(3, 24, 42, 0.48),
+    0 25px 60px rgba(0, 0, 0, 0.35),
+    0 0 0 10px rgba(255, 255, 255, 0.03);
+  transform: translate(-50%, -50%);
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    z-index: 3;
+    inset: 0;
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  &::before {
+    border-left: 1px solid rgba(255, 255, 255, 0.22);
+    border-right: 1px solid rgba(255, 255, 255, 0.18);
+    transform: scaleX(0.48);
+  }
+  &::after {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.13),
+      transparent 28%,
+      transparent 67%,
+      rgba(2, 20, 34, 0.25)
+    );
+  }
+}
+.globe__world {
+  position: absolute;
+  inset: 0;
+}
+.land {
+  position: absolute;
+  display: block;
+  background: #9ebf7b;
+  box-shadow: inset -8px -5px rgba(65, 105, 68, 0.2);
+}
+.land--one {
+  left: 19px;
+  top: 60px;
+  width: 94px;
+  height: 62px;
+  border-radius: 58% 32% 64% 36%;
+  transform: rotate(19deg);
+
+  &::after {
+    content: "";
+    position: absolute;
+    left: 52px;
+    top: 42px;
+    width: 36px;
+    height: 65px;
+    border-radius: 30% 60% 70% 40%;
+    background: inherit;
+    transform: rotate(-24deg);
+  }
+}
+.land--two {
+  right: 18px;
+  top: 45px;
+  width: 90px;
+  height: 54px;
+  border-radius: 60% 35% 50% 45%;
+  transform: rotate(-12deg);
+
+  &::after {
+    content: "";
+    position: absolute;
+    right: 22px;
+    top: 39px;
+    width: 35px;
+    height: 72px;
+    border-radius: 30% 55% 65% 40%;
+    background: inherit;
+    transform: rotate(16deg);
+  }
+}
+.land--three {
+  right: 31px;
+  bottom: 32px;
+  width: 48px;
+  height: 30px;
+  border-radius: 60% 40%;
+  transform: rotate(-17deg);
+}
+.latitude {
+  position: absolute;
+  z-index: 2;
+  left: 5%;
+  width: 90%;
+  height: 34%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 50%;
+}
+.latitude--one {
+  top: 15%;
+}
+.latitude--two {
+  bottom: 15%;
+}
+
+.route {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+
+  path {
+    fill: none;
+    stroke: rgba(255, 224, 184, 0.9);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-dasharray: 5 5;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.28));
+  }
+  &.is-flying path {
+    animation: route-dash 1s linear infinite;
+  }
+}
+.place {
+  position: absolute;
+  z-index: 7;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  min-width: 76px;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.55);
+  transform: translate(-50%, -12.5px);
+
+  i {
+    width: 25px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border: 2px solid rgba(255, 255, 255, 0.65);
+    border-radius: 50% 50% 50% 0;
+    color: white;
+    background: #c95a79;
+    font-style: normal;
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.28);
+    transform: rotate(-45deg);
+
+    b {
+      font-size: 9px;
+      transform: rotate(45deg);
+    }
+  }
+  span {
+    max-width: 78px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+.place--a {
+  left: 18.6%;
+  top: 73.6%;
+}
+.place--b {
+  left: 81%;
+  top: 24%;
+}
+
+.flying-letter {
+  position: absolute;
+  z-index: 9;
+  left: 18.6%;
+  top: 73.6%;
+  width: 32px;
+  height: 23px;
+  border: 2px solid rgba(89, 36, 57, 0.28);
+  border-radius: 4px;
+  background: #fff2d6;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.22);
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(-12deg) scale(0.85);
+  will-change: left, top, transform, opacity;
+
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    top: 1px;
+    width: 18px;
+    height: 2px;
+    background: #b8c9d4;
+    transform-origin: top;
+  }
+  &::before {
+    left: 0;
+    transform: rotate(35deg);
+  }
+  &::after {
+    right: 0;
+    transform: rotate(-35deg);
+  }
+  span {
+    position: absolute;
+    z-index: 2;
+    left: 50%;
+    top: 48%;
+    color: var(--berry);
+    font-size: 9px;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.delivery__progress {
+  width: min(300px, 75vw);
+  height: 3px;
+  margin: -7px auto 12px;
+  overflow: hidden;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.14);
+
+  span {
+    display: block;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, #f5b1bd, #ffe3a8);
+    transform: scaleX(0);
+    transform-origin: left;
+    will-change: transform;
+  }
+}
+.delivery__status {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.skip-button {
+  margin-top: 18px;
+  border: 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.57);
+  background: none;
+  @include mixins.dm-sans(600, 10px);
+  cursor: pointer;
+
+  &:hover {
+    color: white;
+  }
+}
+
+@keyframes route-dash {
+  to {
+    stroke-dashoffset: -10;
+  }
+}
